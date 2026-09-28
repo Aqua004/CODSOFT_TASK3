@@ -1,1 +1,1 @@
-Place the CodSoft Task 3 dataset here as churn.csv. Expected binary label: Churn with Yes/No values. Personal customer data must not be committed.
+Download the bank customer churn dataset linked by Task 3 in the CodSoft PDF: https://www.kaggle.com/datasets/shantanudhakadd/bank-customer-churn-prediction . Place the downloaded CSV in this directory and pass its actual filename to src/train.py --data. Supported binary targets: Exited, churn, or Churn. Do not commit customer-level records.

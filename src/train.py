@@ -14,25 +14,29 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--data', default='data/churn.csv')
+    parser = argparse.ArgumentParser(description='Train a bank customer churn classifier')
+    parser.add_argument('--data', required=True, help='Path to the downloaded CSV')
     args = parser.parse_args()
-    data = pd.read_csv(args.data)
-    if 'Churn' not in data:
-        parser.error('Missing Churn label; adapt the script for your dataset')
-    labels = data.pop('Churn').astype(str).str.strip().str.lower()
-    if not set(labels.unique()).issubset({'yes', 'no'}) or labels.nunique() != 2:
-        parser.error('Churn must contain both Yes and No')
-    y = labels.map({'no': 0, 'yes': 1})
-    data = data.drop(columns=['customerID'], errors='ignore')
-    if 'TotalCharges' in data:
-        data['TotalCharges'] = pd.to_numeric(data['TotalCharges'], errors='coerce')
-    numeric = data.select_dtypes(include='number').columns.tolist()
-    categorical = data.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
+    frame = pd.read_csv(args.data)
+    candidates = [column for column in frame if column.strip().lower() in {'exited', 'churn'}]
+    if len(candidates) != 1:
+        parser.error('Expected exactly one target column named Exited or Churn; inspect your CSV headers')
+    target = candidates[0]
+    values = frame.pop(target).astype(str).str.strip().str.lower()
+    if set(values.unique()) == {'0', '1'}:
+        y = values.astype(int)
+    elif set(values.unique()) == {'yes', 'no'}:
+        y = values.map({'no': 0, 'yes': 1})
+    else:
+        parser.error('Target must contain both 0/1 or both Yes/No, with no missing values')
+    dropped = ['RowNumber', 'CustomerId', 'CustomerID', 'customerID', 'Surname', 'id', 'Unnamed: 0']
+    frame = frame.drop(columns=dropped, errors='ignore')
+    numeric = frame.select_dtypes(include='number').columns.tolist()
+    categorical = frame.select_dtypes(include=['object', 'category', 'bool']).columns.tolist()
     if not numeric and not categorical:
-        parser.error('No usable features found')
+        parser.error('No supported feature columns found')
     x_train, x_test, y_train, y_test = train_test_split(
-        data[numeric + categorical], y, stratify=y, test_size=0.2, random_state=42
+        frame[numeric + categorical], y, stratify=y, test_size=0.2, random_state=42
     )
     preprocess = ColumnTransformer([
         ('num', Pipeline([('impute', SimpleImputer(strategy='median')), ('scale', StandardScaler())]), numeric),

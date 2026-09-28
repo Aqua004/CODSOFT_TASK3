@@ -1,22 +1,21 @@
-# Customer Churn Prediction (CodSoft Task 3)
+# Bank Customer Churn Prediction (CodSoft Task 3)
 
-Predict whether a customer will churn with a preprocessing pipeline and logistic regression. This implementation expects the IBM-style Telco Customer Churn dataset with `Churn` as Yes/No and optionally `TotalCharges`, `customerID`, and `tenure`. Adjust the parser if your CodSoft download differs.
+Predict whether a bank customer leaves using the bank churn dataset linked in the CodSoft PDF: https://www.kaggle.com/datasets/shantanudhakadd/bank-customer-churn-prediction . This project does not claim any measured score until you run it.
 
 ## Dataset
-Download the dataset through the Task 3 link in the internship PDF. Save it as `data/churn.csv`; do not commit the raw file.
+Download the linked dataset and put its CSV into `data/`. The script accepts `Exited` (0/1), `churn` (0/1), or `Churn` (Yes/No or 0/1) as the target; pass the actual file name with `--data`. Bank-style columns such as `CreditScore`, `Geography`, `Gender`, `Age`, `Tenure`, `Balance`, `NumOfProducts`, and `EstimatedSalary` are used if present. Customer identifiers and names are excluded. Check your CSV headers before running. Do not commit customer data.
 
 ## Run
 ```bash
 python -m venv .venv
-# Activate the environment
+# Activate the virtual environment
 pip install -r requirements.txt
-python src/train.py --data data/churn.csv
+python src/train.py --data data/Churn_Modelling.csv
 ```
+Replace the filename in the last command with your actual downloaded CSV filename. The script saves a model in `models/` and measured metrics in `results/` locally; both are gitignored. It reports churn precision, recall, F1, ROC-AUC, average precision, and confusion matrix. Preprocessing is fit after the stratified holdout split.
 
-The script writes `results/metrics.json` and `models/churn_model.joblib`, both excluded from git. It reports churn precision/recall/F1, ROC-AUC, average precision, and a confusion matrix. Split before fitting imputers, encoders, and scaler. Results depend on the data version.
-
-## Demo / submission
-Show a run, explain which customer attributes were used, report actual holdout metrics, and discuss false negatives. Do not claim the model is ready for real customer decisions without further validation.
+## Submission
+Run on your downloaded dataset, inspect the results and demonstrate the run on video. Add measured results here only after verifying them. If the dataset has a different label or structure, adapt the parser before claiming results.
 
 ## Results
 Not yet run or independently verified.
